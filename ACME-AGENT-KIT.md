@@ -19,10 +19,12 @@ Everything Acme-specific lives in the files below; the rest is upstream.
 | `.cursor/rules/40-boundaries.mdc`                  | What a change may pull in, and what to do when a boundary blocks you                                                     |
 | `.cursor/rules/50-ai-use-policy.mdc`               | What the agent does on its own and what it hands back to the engineer                                                    |
 | `.cursor/skills/first-contribution/`               | Guided first change: pick a ticket, map it, write a plan, stop for approval                                              |
+| `.cursorignore`                                    | Hides vendored code and secret-like files from the agent (best-effort; not a security boundary)                          |
 | `.importlinter`                                    | `_skimage2` must never import the `skimage` or `skimage2` shims                                                          |
 | `tools/acme/check_boundaries.py`, `allowlist.toml` | Library code may only import declared dependencies or baselined packages                                                 |
 | `.pre-commit-config.yaml` (`acme-boundaries` hook) | Runs the dependency check before each commit                                                                             |
 | `.github/workflows/acme-guardrails.yaml`           | Runs both checks on every PR; on merge, a mocked release waits for approval in the `acme-release` environment            |
+| `.github/CODEOWNERS`                               | Kit files, workflows and dependencies need the platform owner's review (with branch protection)                          |
 
 ## How to run it
 

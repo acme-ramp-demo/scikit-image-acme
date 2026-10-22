@@ -1,0 +1,10 @@
+# Changes here alter what agents may do or what code may ship.
+# They need review from the platform owner (at Acme: platform + DevOps teams).
+# Enforced only with branch protection "Require review from Code Owners".
+/.cursor/                  @jimmy-ungerman
+/.cursorignore             @jimmy-ungerman
+/.importlinter             @jimmy-ungerman
+/.pre-commit-config.yaml   @jimmy-ungerman
+/tools/acme/               @jimmy-ungerman
+/.github/                  @jimmy-ungerman
+/pyproject.toml            @jimmy-ungerman

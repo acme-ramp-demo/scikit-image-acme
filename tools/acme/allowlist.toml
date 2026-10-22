@@ -2,7 +2,7 @@
 #
 # Runtime dependencies come from pyproject.toml [project] dependencies.
 # Changing this file widens what library code may import, so it is
-# CODEOWNERS-protected and needs DevOps approval.
+# owned in .github/CODEOWNERS and needs DevOps approval.
 
 # Optional extras whose packages library code may import (guarded, optional use).
 allowed_extras = ["data", "optional"]

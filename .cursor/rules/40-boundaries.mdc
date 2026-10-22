@@ -17,7 +17,7 @@ These are enforced by checks in `tools/acme/` and CI. The agent follows them so 
 ## Context boundaries (synthesized Acme policy)
 - Work only from this repository and the docs it contains.
 - Don't paste code from external sources, other projects, or web search into the library. Licensing and provenance matter here.
-- Use only the MCP servers listed as approved in `.cursor/mcp.json`.
+- This project uses no MCP servers. Don't call MCP tools on this repository; if a task seems to need one, stop and say which and why. (At Acme, enforcement is Cursor Enterprise's MCP allowlist in Team Settings → MCP Configuration. A project file can't block personal servers.)
 - Secrets never go in code, tests, or prompts.
 
 ## When a boundary blocks you

@@ -1,0 +1,13 @@
+# Acme agent context boundary. Files here are hidden from Cursor's Agent, Tab,
+# Inline Edit and @-mentions. Best-effort only: the agent's terminal and MCP
+# tools can still read them. The hard boundaries are the CI checks.
+
+# Third-party code kept as-is (boundaries rule: never edit vendored code)
+src/_skimage2/_vendored/
+
+# Secrets and credentials (synthesized Acme policy; none exist in this repo)
+.env
+.env.*
+*.pem
+*.key
+**/secrets/
