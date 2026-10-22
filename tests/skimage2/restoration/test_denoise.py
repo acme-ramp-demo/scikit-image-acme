@@ -8,6 +8,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from _skimage2 import color, data, img_as_float, restoration
 from _skimage2._shared._warnings import expected_warnings
+from _skimage2._shared.testing import assert_stacklevel
 from _skimage2._shared.utils import _supported_float_type, slice_at_axis
 from _skimage2.metrics import peak_signal_noise_ratio, structural_similarity
 from _skimage2.restoration._denoise import _wavelet_threshold
@@ -1196,3 +1197,100 @@ def test_cycle_spinning_workers():
         )
     assert_array_almost_equal(dn_cc1, dn_cc2)
     assert_array_almost_equal(dn_cc1, dn_cc3)
+
+
+# Generated once with: python -c "import random; print(random.randint(0, 2**32-1))"
+_CYCLE_SPIN_SEED = 3401186782
+
+
+def _scale_image(image, sigma):
+    return image * sigma
+
+
+def _echo_image(image):
+    return image
+
+
+def _force_dask_unavailable(monkeypatch):
+    import _skimage2.restoration._cycle_spin as cycle_spin_module
+
+    monkeypatch.setattr(cycle_spin_module, 'dask_available', False)
+
+
+def test_cycle_spin_func_kw_positional():
+    rstate = np.random.RandomState(_CYCLE_SPIN_SEED)
+    img = rstate.random((8, 8))
+    positional = restoration.cycle_spin(
+        img, _scale_image, 1, 1, {'sigma': 0.1}, workers=1
+    )
+    keyword = restoration.cycle_spin(
+        img, _scale_image, 1, 1, func_kw={'sigma': 0.1}, workers=1
+    )
+    assert_array_equal(positional, keyword)
+
+
+def test_cycle_spin_func_kw_positional_channel_axis():
+    rstate = np.random.RandomState(_CYCLE_SPIN_SEED)
+    img = rstate.random((8, 8, 3))
+    positional = restoration.cycle_spin(
+        img, _scale_image, 1, 1, {'sigma': 0.1}, workers=1, channel_axis=-1
+    )
+    keyword = restoration.cycle_spin(
+        img,
+        _scale_image,
+        1,
+        1,
+        func_kw={'sigma': 0.1},
+        workers=1,
+        channel_axis=-1,
+    )
+    assert_array_equal(positional, keyword)
+
+
+def test_cycle_spin_dask_unavailable_stacklevel(monkeypatch):
+    _force_dask_unavailable(monkeypatch)
+    rstate = np.random.RandomState(_CYCLE_SPIN_SEED)
+    img = rstate.random((8, 8))
+    with pytest.warns(
+        UserWarning, match='The optional dask dependency is not installed'
+    ) as record:
+        restoration.cycle_spin(img, _echo_image, 1, workers=None)
+    assert_stacklevel(record)
+
+
+def test_cycle_spin_dask_unavailable_stacklevel_channel_axis(monkeypatch):
+    _force_dask_unavailable(monkeypatch)
+    rstate = np.random.RandomState(_CYCLE_SPIN_SEED)
+    img = rstate.random((8, 8, 3))
+    with pytest.warns(
+        UserWarning, match='The optional dask dependency is not installed'
+    ) as record:
+        restoration.cycle_spin(img, _echo_image, 1, workers=None, channel_axis=-1)
+    assert_stacklevel(record)
+
+
+@pytest.mark.xfail(
+    reason=(
+        "Serial cycle_spin adds uint8 func output in place and then "
+        "true-divides that array. NumPy raises UFuncTypeError, a TypeError, "
+        "instead of returning the float running average."
+    ),
+    raises=TypeError,
+)
+def test_cycle_spin_uint8_one_pixel_average_not_truncated():
+    # The seed only builds the 1-pixel input. Circular shifts do not change
+    # that pixel, and the func ignores its values, so the expected average
+    # 1.5 does not depend on the seed. It is the mean of the scripted uint8
+    # outputs 1 and 2.
+    rstate = np.random.RandomState(_CYCLE_SPIN_SEED)
+    img = rstate.randint(0, 256, size=(1, 1)).astype(np.uint8)
+    call_index = {'n': 0}
+
+    def func(image):
+        call_index['n'] += 1
+        value = np.uint8(1 if call_index['n'] % 2 else 2)
+        return np.full(image.shape, value, dtype=np.uint8)
+
+    result = restoration.cycle_spin(img, func, 1, workers=1)
+    assert result.dtype.kind == 'f'
+    assert_array_equal(result, np.full(img.shape, 1.5))
