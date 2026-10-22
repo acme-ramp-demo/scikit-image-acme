@@ -1,0 +1,42 @@
+name: Acme PR review
+
+# Advisory review by a Cursor Cloud Agent, started through the Cursor
+# Cloud Agents API. It reviews the PR against .cursor/rules/ and posts one
+# comment. It never blocks the PR; Acme guardrails is the gate.
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+    branches: [acme/agent-kit, main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: acme-pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Agent review (advisory)
+    # Secrets are not available to PRs from forks; skip them.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Run the review script from the BASE branch, never from the PR, so a
+      # pull request cannot change the code that holds CURSOR_API_KEY.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Request review from a Cursor Cloud Agent
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python tools/acme/pr_review.py
