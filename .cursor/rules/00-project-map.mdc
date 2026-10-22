@@ -11,7 +11,7 @@ alwaysApply: true
 | --- | --- | --- |
 | `src/_skimage2/` | **The implementation.** Real functions, Cython, `_shared` helpers. | Yes, almost always. |
 | `src/skimage/` | Stable public API (v1.x). Mostly re-exports from `_skimage2`, sometimes wrapped with `ski2_migration_decorator` when behavior differs. | Only shims, migration wrappers, or v1-only behavior. |
-| `src/skimage2/` | Experimental new API namespace. Thin modules that delegate to `_skimage2`. | Only namespace wiring. |
+| `src/skimage2/` | Experimental new API namespace. Each module forwards `__getattr__`, `__dir__`, and `__all__` to the matching `_skimage2` module, so it exposes everything `_skimage2` does, even though its own `.pyi` stubs don't list the names. | Only namespace wiring. |
 
 - Import direction is one-way: `skimage` and `skimage2` import from `_skimage2`. `_skimage2` must never import from `skimage` or `skimage2` (doctest examples excepted).
 - Public names are declared in `__init__.pyi` stub files and loaded lazily with `lazy_loader.attach_stub`. Adding or removing a public function means editing the matching `__init__.pyi` `__all__`.
