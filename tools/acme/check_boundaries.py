@@ -15,6 +15,7 @@ Usage:
 import ast
 import re
 import sys
+
 try:
     import tomllib
 except ModuleNotFoundError:  # Python < 3.11
@@ -73,7 +74,9 @@ def main(argv):
         files = [Path(p) for p in argv if p.endswith(".py")]
     else:
         files = [
-            p for p in (ROOT / "src").rglob("*.py") if not {"_vendored", "_build_utils"} & set(p.parts)
+            p
+            for p in (ROOT / "src").rglob("*.py")
+            if not {"_vendored", "_build_utils"} & set(p.parts)
         ]
 
     violations = []
@@ -96,7 +99,9 @@ def main(argv):
         )
         return 1
 
-    print(f"Boundary check passed ({len(files)} files, {len(allowed)} allowed packages).")
+    print(
+        f"Boundary check passed ({len(files)} files, {len(allowed)} allowed packages)."
+    )
     return 0
 
 
