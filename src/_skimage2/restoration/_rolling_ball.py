@@ -14,7 +14,7 @@ from ._rolling_ball_cy import apply_kernel, apply_kernel_nan
 def rolling_ball(
     image,
     *,
-    radius=100,
+    radius=50,
     kernel=None,
     nansafe=False,
     num_threads=DEPRECATED,
