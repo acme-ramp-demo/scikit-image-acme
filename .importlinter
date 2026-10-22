@@ -1,0 +1,14 @@
+[importlinter]
+root_packages =
+    _skimage2
+    skimage
+    skimage2
+
+[importlinter:contract:impl-is-independent]
+name = _skimage2 (implementation) must not import the public skimage or skimage2 namespaces
+type = forbidden
+source_modules =
+    _skimage2
+forbidden_modules =
+    skimage
+    skimage2

@@ -1,0 +1,36 @@
+---
+description: Where code lives in scikit-image and how to build and test it. Read before planning any change.
+alwaysApply: true
+---
+
+# Project map (scikit-image, Acme core-library stand-in)
+
+## Three package trees, one implementation
+
+| Tree | Role | Put new code here? |
+| --- | --- | --- |
+| `src/_skimage2/` | **The implementation.** Real functions, Cython, `_shared` helpers. | Yes, almost always. |
+| `src/skimage/` | Stable public API (v1.x). Mostly re-exports from `_skimage2`, sometimes wrapped with `ski2_migration_decorator` when behavior differs. | Only shims, migration wrappers, or v1-only behavior. |
+| `src/skimage2/` | Experimental new API namespace. Thin modules that delegate to `_skimage2`. | Only namespace wiring. |
+
+- Import direction is one-way: `skimage` and `skimage2` import from `_skimage2`. `_skimage2` must never import from `skimage` or `skimage2` (doctest examples excepted).
+- Public names are declared in `__init__.pyi` stub files and loaded lazily with `lazy_loader.attach_stub`. Adding or removing a public function means editing the matching `__init__.pyi` `__all__`.
+- Inside a package, use relative imports: `from .._shared import utils`, not `from _skimage2._shared import utils`.
+
+## Tests mirror the trees
+
+- Tests live in `tests/`, not next to the source: `tests/skimage/<subpackage>/` and `tests/skimage2/<subpackage>/`.
+- Many test files exist in **both** trees. When behavior changes in `_skimage2`, check and update both copies.
+- Docstring examples are doctests and run in CI.
+
+## Commands
+
+- Build once (slow, ~5 min): `pip install --no-build-isolation -e .` or `spin build`.
+- Fast loop: `spin test -- tests/skimage/<subpackage> tests/skimage2/<subpackage>`.
+- What CI runs on a PR: `spin test --test-modified` (only changed subpackages).
+- Lint: `pre-commit run --files <changed files>` (ruff check, ruff format, cython-lint, prettier).
+- Warnings are errors in tests unless `SKIMAGE_TEST_STRICT_WARNINGS=0`.
+
+## Source of truth
+
+The upstream guides in `doc/source/development/` (`guidelines.md`, `deprecations.md`, `testing.md`) win over these rules if they disagree. Flag the disagreement; don't silently pick one.

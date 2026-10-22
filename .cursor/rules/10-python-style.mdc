@@ -1,0 +1,33 @@
+---
+description: scikit-image coding conventions for Python source. Apply when writing or editing library code.
+globs: src/**/*.py, src/**/*.pyx, src/**/*.pyi
+alwaysApply: false
+---
+
+# Python conventions
+
+## Imports
+- Canonical aliases: `import numpy as np`, `import scipy as sp`, `import matplotlib.pyplot as plt`, `import skimage as ski`.
+- Call SciPy through the alias: `sp.ndimage.label(...)`, not `from scipy.ndimage import label`.
+- Relative imports within the package (see project map).
+
+## Arrays and dtypes
+- Use NumPy dtype objects, not strings: `np.uint8`, never `"uint8"`.
+- Functions accept all input image dtypes. Convert with helpers such as `img_as_float` or `_supported_float_type`; don't assume float input.
+- Dimensions are (plane), row, column. Never name them x, y, z in parameters, docs, or variables.
+
+## Docstrings (numpydoc)
+- Every public function has a numpydoc docstring: summary line, `Parameters`, `Returns`, and `Examples` where practical.
+- Array parameters are written `image : ndarray of shape (M, N)`, then refer to `M` and `N`.
+- Note units (for example radians) explicitly.
+- New public functionality also gets a gallery example under `doc/examples/`.
+
+## Cython
+- Release the GIL with `with nogil:` where possible.
+- Wrap every Cython function in a pure-Python function that defines the public API.
+- Use `Py_ssize_t` for indexing, shape, and size variables.
+
+## Don't
+- Don't add a new runtime dependency (see boundaries rule).
+- Don't change a public signature or default without a deprecation cycle (see deprecations rule).
+- Don't use the global NumPy RNG anywhere.

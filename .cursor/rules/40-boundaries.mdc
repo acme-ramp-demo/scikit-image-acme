@@ -1,0 +1,24 @@
+---
+description: What code and context a change may pull in. Always applies. Enforced deterministically in pre-commit and CI; this rule explains why.
+alwaysApply: true
+---
+
+# Boundaries
+
+These are enforced by checks in `tools/acme/` and CI. The agent follows them so the checks never have to fire.
+
+## Code boundaries
+- **Import direction:** `skimage` and `skimage2` may import `_skimage2`. `_skimage2` must not import `skimage` or `skimage2`. (Upstream convention; enforced by an import-linter contract.)
+- **Private internals:** don't import underscore-prefixed modules from another subpackage's internals in new code. Use the subpackage's public API or `_shared`.
+- **Dependencies:** runtime dependencies are fixed by `pyproject.toml` `[project] dependencies`. Adding or loosening one requires a human approval (DevOps gate). Don't add it and ask later.
+- **Vendored code:** `_vendored/` is third-party code kept as-is. Don't edit it or add to it.
+- **No network in library code or tests**, except the existing `skimage.data` fetch path.
+
+## Context boundaries (synthesized Acme policy)
+- Work only from this repository and the docs it contains.
+- Don't paste code from external sources, other projects, or web search into the library. Licensing and provenance matter here.
+- Use only the MCP servers listed as approved in `.cursor/mcp.json`.
+- Secrets never go in code, tests, or prompts.
+
+## When a boundary blocks you
+Stop and say which boundary and why. Propose the exception for a human to approve. Never work around a check (no `# noqa` or `--no-verify` to get past a boundary failure).

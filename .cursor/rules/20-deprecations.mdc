@@ -1,0 +1,33 @@
+---
+description: When and how to deprecate or remove API in scikit-image, including completing a scheduled deprecation from TODO.txt. Apply to any change that touches a public signature, default, name, or location.
+globs: src/**/*.py, TODO.txt, doc/release/**
+alwaysApply: false
+---
+
+# Deprecations
+
+## Is a deprecation cycle needed?
+
+Not needed: a new function; a new keyword at the **end** of a signature; fixing incorrect behavior.
+
+Needed: renaming a keyword; reordering arguments; adding a positional argument; renaming or moving a function; changing any default value. Warnings usually stay in place for two releases.
+
+## Starting a deprecation
+- Use the helpers in `_skimage2._shared.utils`, never hand-rolled warnings:
+  - `@deprecate_parameter("old", new_name="new", start_version="X", stop_version="Y")` with `old=DEPRECATED` in the signature.
+  - `@deprecate_func(...)` for whole functions.
+  - For one-off messages: `_skimage2._shared._warnings.warn_external(..., category=FutureWarning)`.
+- Deprecations raise `FutureWarning`.
+- Add a `TODO.txt` entry under the `stop_version` section with enough detail that the release manager needs no other reference.
+- Describe the change in a `release-note` block in the PR description.
+
+## Completing a deprecation (removing it) checklist
+Every item, or the PR is not done:
+1. Remove the `@deprecate_parameter` / `@deprecate_func` decorator in `src/_skimage2/...`.
+2. Remove the deprecated parameter from the signature.
+3. Remove now-unused imports (often `DEPRECATED`, `deprecate_parameter`).
+4. Remove docstring text that mentions the old name (for example "Replaces deprecated parameter ...").
+5. Remove the deprecation tests in **both** `tests/skimage/...` and `tests/skimage2/...`.
+6. `grep -rn "<old_name>" src tests doc/examples` returns nothing related to this function.
+7. Delete the matching item from `TODO.txt`.
+8. Add a `release-note` block saying what was removed and what to use instead.

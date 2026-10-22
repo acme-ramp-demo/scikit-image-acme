@@ -1,0 +1,23 @@
+# Acme dependency policy (synthesized for the take-home).
+#
+# Runtime dependencies come from pyproject.toml [project] dependencies.
+# Changing this file widens what library code may import, so it is
+# CODEOWNERS-protected and needs DevOps approval.
+
+# Optional extras whose packages library code may import (guarded, optional use).
+allowed_extras = ["data", "optional"]
+
+# Baseline: packages that existing library code imports lazily or optionally
+# but that are not declared under that name in an allowed extra. Recorded
+# 2026-10-22 against upstream b700edc. New entries need a reason and approval.
+extra_imports = [
+    "matplotlib",    # plotting helpers and io plugin; imported inside functions
+    "mpl_toolkits",  # part of matplotlib (io plugin)
+    "dask",          # optional parallelism in apply_parallel and cycle_spin
+    "pywt",          # PyWavelets, optional for wavelet denoising
+    "pytest",        # test helpers shipped in the package (_shared/testing.py)
+    "numpydoc",      # docstring tooling used by deprecation helpers
+    "astropy",       # optional FITS io plugin
+    "imread",        # optional io plugin
+    "osgeo",         # GDAL, optional io plugin
+]

@@ -1,0 +1,29 @@
+---
+description: How tests are written and run in scikit-image. Apply when adding, changing, or reviewing tests.
+globs: tests/**/*.py
+alwaysApply: false
+---
+
+# Testing
+
+## Where
+- `tests/skimage/<subpackage>/test_*.py` and `tests/skimage2/<subpackage>/test_*.py`. Check both trees.
+- Behavior changes need a test that would have failed before the change.
+
+## Randomness
+- Use a local `np.random.RandomState(<fixed seed>)`. Never the global RNG, never `np.random.default_rng` in tests.
+- Hard-code a seed generated once with `python -c "import random; print(random.randint(0, 2**32-1))"`.
+- If the expected values depend on that seed, say so in a comment.
+
+## Warnings and threads
+- Warnings fail tests by default. Assert expected ones with `pytest.warns(FutureWarning, match=...)`.
+- CI runs tests in parallel threads (free-threaded Python, pytest-run-parallel). No module-level mutable state in tests or code under test.
+
+## What makes a good test here
+- Test edge cases tied to how the algorithm can go wrong: dtype extremes, empty or 1-pixel images, NaN handling, n-D input, `channel_axis` handling.
+- Don't add trivial parameter-validation tests just for coverage.
+- The agent may propose edge cases and write test scaffolding. **The engineer decides which cases matter** and confirms each one (see the AI policy rule).
+
+## Run
+- `spin test -- tests/skimage/<sub> tests/skimage2/<sub>` while iterating.
+- `spin test --test-modified --doctest` before pushing.

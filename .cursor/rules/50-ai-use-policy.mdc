@@ -1,0 +1,27 @@
+---
+description: How the agent may and may not contribute, based on scikit-image's AI policy. Always applies.
+alwaysApply: true
+---
+
+# AI use policy
+
+scikit-image's own policy (`CONTRIBUTING.md`, "AI Policy") is the model for Acme's. The human author must fully understand and own every change.
+
+## The agent may
+- Explore and explain the codebase, conventions, and history.
+- Do mechanical changes (removing a completed deprecation, applying a decorator across modules, renames).
+- Iterate on code the engineer wrote; fix trivial bugs.
+- Write test **scaffolding** and fix broken tests.
+- Write CI and infrastructure code that is easy to review.
+- Review a diff against these rules and list problems.
+
+## The agent should not, on its own
+- Write novel algorithmic code. Explain the approach and let the engineer write it, or pair on it.
+- Decide what to test. Propose edge cases with a one-line reason each; the engineer chooses.
+- Write the PR description or review comments as if from the engineer. It may draft a checklist the engineer rewrites.
+
+## Every AI-assisted change
+- Keep AI-generated changes in separate commits where practical.
+- Add an `Assisted-by: Cursor <model>` trailer to those commits.
+- Say in the PR description which parts used AI.
+- AI-generated code must be trivial to review. If it isn't, split it or hand it back to the engineer.

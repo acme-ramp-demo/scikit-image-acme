@@ -48,6 +48,15 @@ repos:
     hooks:
       - id: zizmor
 
+  - repo: local
+    hooks:
+      - id: acme-boundaries
+        name: Acme dependency allowlist
+        entry: python tools/acme/check_boundaries.py
+        language: system
+        types: [python]
+        files: ^src/
+
 ci:
   autofix_prs: false
   autofix_commit_msg: |

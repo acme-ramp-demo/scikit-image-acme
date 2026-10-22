@@ -1,0 +1,38 @@
+name: Acme guardrails
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  boundaries:
+    name: Boundaries (imports + dependency allowlist)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Dependency allowlist
+        run: python tools/acme/check_boundaries.py
+      - name: Import direction contract
+        run: |
+          pip install import-linter
+          cd src && PYTHONPATH=. lint-imports --config ../.importlinter
+
+  release-gate:
+    # Mocked deploy target. The environment's required reviewer is the human
+    # approval; Grok Bot records the DevOps decision through the orchestrator.
+    name: Release (mocked)
+    needs: boundaries
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: acme-release
+    steps:
+      - run: echo "MOCK DEPLOY - would publish wheel for ${GITHUB_SHA}"
