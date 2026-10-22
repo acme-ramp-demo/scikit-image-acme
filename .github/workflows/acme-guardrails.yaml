@@ -3,7 +3,7 @@ name: Acme guardrails
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, acme/agent-kit]
 
 permissions:
   contents: read
