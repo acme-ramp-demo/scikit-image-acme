@@ -6,8 +6,10 @@ name: Acme PR review
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review, synchronize]
+    types: [opened, reopened, ready_for_review, synchronize, edited]
     branches: [acme/agent-kit, main]
+    paths-ignore:
+      - "plans/**"
 
 permissions:
   contents: read

@@ -18,7 +18,7 @@ Walk the engineer through these stages in order. Stop at each **Checkpoint** and
 - List files grouped by tree: `src/_skimage2`, `src/skimage`, `src/skimage2`, `tests/skimage`, `tests/skimage2`, docs, `TODO.txt`.
 - For each file, one line on what changes and which rule requires it.
 
-**Checkpoint: the plan.** Write the plan to `plans/<ticket-slug>.md` (scope, files, conventions applied, test approach, risks). This file is what the PM approves in Grok Bot (Gate 1). Do not edit code until it is approved.
+**Checkpoint: the plan.** Write the plan to `plans/<ticket-slug>.md` (scope, files, conventions applied, test approach, risks), and return the full plan in your reply. This is what the PM approves in Grok Bot (Gate 1). Do not edit code, and do not commit, push, or open a pull request, until the plan is approved. The plan file is committed later, together with the change.
 
 ## 3. Make the change
 
@@ -41,4 +41,4 @@ Walk the engineer through these stages in order. Stop at each **Checkpoint** and
 ## 6. Open the PR
 
 - Draft a checklist for the PR description: what changed, which parts used AI, the `release-note` block. The engineer writes the final words.
-- Push a branch and open the PR. The review Automation and CI take it from there.
+- Commit the plan file and the change on one branch, push it, and open ONE draft pull request. The agent review and CI take it from there.
