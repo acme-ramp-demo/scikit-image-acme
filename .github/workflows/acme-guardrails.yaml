@@ -26,9 +26,25 @@ jobs:
           pip install import-linter
           cd src && PYTHONPATH=. lint-imports --config ../.importlinter
 
-  release-gate:
-    # Mocked deploy target. The environment's required reviewer is the human
-    # approval; Grok Bot records the DevOps decision through the orchestrator.
+  devops-signoff:
+    # Gate 2, before merge. The acme-signoff environment requires a DevOps
+    # reviewer, so this job waits until someone approves it with
+    # "Review deployments". The ruleset makes this job a required status
+    # check, so the PR cannot merge until DevOps signs off. A new push to
+    # the PR starts a new run, so approval always applies to the latest commit.
+    # Grok Bot's Release readiness skill links DevOps to the waiting run.
+    name: DevOps sign-off (Gate 2)
+    needs: boundaries
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: acme-signoff
+    steps:
+      - run: echo "DevOps signed off on ${{ github.event.pull_request.head.sha }}"
+
+  release:
+    # Mocked deploy after merge. No approval here: DevOps already signed off
+    # on the PR. Direct pushes need an admin bypass of the branch ruleset,
+    # which GitHub logs.
     name: Release (mocked)
     needs: boundaries
     if: github.event_name == 'push'
