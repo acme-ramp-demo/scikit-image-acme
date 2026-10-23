@@ -1280,7 +1280,7 @@ SKIMAGE_API = {
     'skimage.restoration:richardson_lucy(image, psf, num_iter=50, clip=True, '
     'filter_epsilon=None)',
     'skimage.restoration:rolling_ball(image, *, radius=100, kernel=None, '
-    'nansafe=False, num_threads=<DEPRECATED>, workers=None)',
+    'nansafe=False, workers=None)',
     'skimage.restoration:unsupervised_wiener(image, psf, reg=None, '
     'user_params=None, is_real=True, clip=True, *, rng=None)',
     'skimage.restoration:unwrap_phase(image, wrap_around=False, rng=None)',

@@ -3,8 +3,6 @@ Tests for Rolling Ball Filter
 (skimage.restoration.rolling_ball)
 """
 
-import inspect
-
 import numpy as np
 import pytest
 
@@ -96,14 +94,3 @@ def test_ndim():
     image = data.cells3d()[:5, 1, ...]
     kernel = ellipsoid_kernel((3, 100, 100), 100)
     rolling_ball(image, kernel=kernel)
-
-
-@pytest.mark.parametrize("num_threads", [None, 1, 2])
-def test_deprecated_num_threads(num_threads):
-    img = 23 * np.ones((100, 100), dtype=np.uint8)
-    with pytest.warns(FutureWarning, match=".*`num_threads` is deprecated") as record:
-        rolling_ball(img, radius=10, num_threads=num_threads)
-        lineno = inspect.currentframe().f_lineno - 1
-    assert len(record) == 1
-    assert record[0].filename == __file__
-    assert record[0].lineno == lineno
