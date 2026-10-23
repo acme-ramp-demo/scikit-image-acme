@@ -1,23 +1,15 @@
 import numpy as np
 
-from _skimage2._shared.utils import (
-    _supported_float_type,
-    deprecate_parameter,
-    DEPRECATED,
-)
+from _skimage2._shared.utils import _supported_float_type
 from ._rolling_ball_cy import apply_kernel, apply_kernel_nan
 
 
-@deprecate_parameter(
-    "num_threads", new_name="workers", start_version="0.26", stop_version="0.28"
-)
 def rolling_ball(
     image,
     *,
     radius=100,
     kernel=None,
     nansafe=False,
-    num_threads=DEPRECATED,
     workers=None,
 ):
     """Estimate background intensity using the rolling-ball algorithm.
@@ -49,7 +41,6 @@ def rolling_ball(
         is determined by the system's OpenMP library.
 
         .. versionadded:: 0.26
-            Replaces deprecated parameter `num_threads`.
 
     Returns
     -------
