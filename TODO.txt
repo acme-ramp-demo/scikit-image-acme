@@ -120,3 +120,4 @@ Version 2.2
   * Rename `_arg_init` methods to `__init__`.
   * Remove tests for `params` arguments, and no-args initialization.  These
     will become apparent when running the test suite after making the changes above.
+* Sign-off gate test (discard).
