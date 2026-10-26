@@ -1,7 +1,7 @@
 from itertools import product
 import numpy as np
 from _skimage2._shared import utils
-from _skimage2._shared.utils import warn, deprecate_parameter, DEPRECATED
+from _skimage2._shared.utils import warn
 
 try:
     import dask
@@ -47,19 +47,12 @@ def _generate_shifts(ndim, multichannel, max_shifts, shift_steps=1):
     return product(*[range(0, s + 1, t) for s, t in zip(max_shifts, shift_steps)])
 
 
-@deprecate_parameter(
-    deprecated_name="num_workers",
-    new_name="workers",
-    start_version="0.26",
-    stop_version="0.28",
-)
 @utils.channel_as_last_axis()
 def cycle_spin(
     x,
     func,
     max_shifts,
     shift_steps=1,
-    num_workers=DEPRECATED,
     func_kw=None,
     *,
     workers=None,

@@ -1256,7 +1256,7 @@ SKIMAGE_API = {
     'skimage.restoration:calibrate_denoiser(image, denoise_function, '
     'denoise_parameters, *, stride=4, approximate_loss=True, extra_output=False)',
     'skimage.restoration:cycle_spin(x, func, max_shifts, shift_steps=1, '
-    'num_workers=<DEPRECATED>, func_kw=None, *, workers=None, channel_axis=None)',
+    'func_kw=None, *, workers=None, channel_axis=None)',
     'skimage.restoration:denoise_bilateral(image, win_size=None, '
     "sigma_color=None, sigma_spatial=1, bins=10000, mode='constant', cval=0, *, "
     'channel_axis=None)',

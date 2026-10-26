@@ -8,7 +8,6 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from skimage import color, data, img_as_float, restoration
 from _skimage2._shared._warnings import expected_warnings
-from _skimage2._shared.testing import assert_stacklevel
 from _skimage2._shared.utils import _supported_float_type, slice_at_axis
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from skimage.restoration._denoise import _wavelet_threshold
@@ -1197,27 +1196,3 @@ def test_cycle_spinning_workers():
         )
     assert_array_almost_equal(dn_cc1, dn_cc2)
     assert_array_almost_equal(dn_cc1, dn_cc3)
-
-
-@xfail_without_pywt
-@pytest.mark.filterwarnings("ignore:.*dask dependency is not installed:UserWarning")
-@pytest.mark.parametrize("num_workers", [None, 1])
-def test_cycle_spinner_deprecate_num_workers(num_workers):
-    img = astro_gray
-    sigma = 0.1
-    rstate = np.random.RandomState(860004639)
-    noisy = img.copy() + 0.1 * rstate.standard_normal(img.shape)
-
-    denoise_func = restoration.denoise_wavelet
-    func_kw = dict(sigma=sigma, channel_axis=-1, rescale_sigma=True)
-
-    with pytest.warns(FutureWarning, match=".*`num_workers` is deprecated") as record:
-        restoration.cycle_spin(
-            noisy,
-            denoise_func,
-            max_shifts=1,
-            func_kw=func_kw,
-            channel_axis=None,
-            num_workers=num_workers,
-        )
-    assert_stacklevel(record, offset=-8)
