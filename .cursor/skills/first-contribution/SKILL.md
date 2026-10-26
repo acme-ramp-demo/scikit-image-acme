@@ -7,6 +7,8 @@ description: Guide a new engineer through their first scoped change in this libr
 
 Walk the engineer through these stages in order. Stop at each **Checkpoint** and wait for them. Follow the rules in `.cursor/rules/`.
 
+**Starting from an approved-plan issue.** If the engineer points you at a GitHub issue labeled `plan-approved` (the PM approved it in Grok Bot), read the issue with `gh issue view <n>`. Write its plan to `plans/<ticket-slug>.md`, create a branch named `ticket/<issue-number>-<ticket-slug>`, and go straight to stage 3. Re-check the plan against the code before editing; if they disagree, stop and tell the engineer. In the pull request description checklist, include `Closes #<n>`.
+
 ## 1. Pick and scope
 
 - If no ticket is given, offer 3 candidates from `TODO.txt` for the current or next version (completing a deprecation is the ideal first task: mechanical, convention-heavy, easy to review).
@@ -41,4 +43,4 @@ Walk the engineer through these stages in order. Stop at each **Checkpoint** and
 ## 6. Open the PR
 
 - Draft a checklist for the PR description: what changed, which parts used AI, the `release-note` block. The engineer writes the final words.
-- Commit the plan file and the change on one branch, push it, and open ONE draft pull request. The agent review and CI take it from there.
+- Commit the plan file and the change on one branch, push it, and open ONE draft pull request into `acme/agent-kit`. The agent review and CI take it from there.
