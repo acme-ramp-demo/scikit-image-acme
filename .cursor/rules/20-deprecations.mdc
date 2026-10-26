@@ -31,3 +31,13 @@ Every item, or the PR is not done:
 6. `grep -rn "<old_name>" src tests doc/examples` returns nothing related to this function.
 7. Delete the matching item from `TODO.txt`.
 8. Add a `release-note` block saying what was removed and what to use instead.
+
+### Also check (gaps agents found in rehearsal)
+- If the removed parameter was positional, every later positional argument
+  shifts one slot left. Say so in the plan and the release note, and confirm
+  that callers who passed that slot already got the deprecation warning.
+- Update the recorded signature in `tests/skimage/test_migration.py`
+  (`SKIMAGE_API`); `test_public_skimage_api` compares it to `inspect.signature`.
+- If you remove a decorator, re-check the `stacklevel` of every warning the
+  wrapped function raises: one fewer wrapper frame means one less level. Tests
+  that only match the warning message will not catch a wrong `stacklevel`.
