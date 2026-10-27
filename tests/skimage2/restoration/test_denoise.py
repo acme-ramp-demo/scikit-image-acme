@@ -1178,7 +1178,7 @@ def test_cycle_spinning_workers():
     )
     assert_array_equal(dn_cc1, dn_cc1_)
 
-    with expected_warnings([DASK_NOT_INSTALLED_WARNING]):
+    with expected_warnings([DASK_NOT_INSTALLED_WARNING]) as record:
         dn_cc2 = restoration.cycle_spin(
             noisy,
             denoise_func,
@@ -1187,6 +1187,9 @@ def test_cycle_spinning_workers():
             channel_axis=None,
             workers=4,
         )
+    if DASK_NOT_INSTALLED_WARNING is not None:
+        assert_stacklevel(record, offset=-9)
+    with expected_warnings([DASK_NOT_INSTALLED_WARNING]) as record:
         dn_cc3 = restoration.cycle_spin(
             noisy,
             denoise_func,
@@ -1195,29 +1198,7 @@ def test_cycle_spinning_workers():
             channel_axis=None,
             workers=None,
         )
+    if DASK_NOT_INSTALLED_WARNING is not None:
+        assert_stacklevel(record, offset=-9)
     assert_array_almost_equal(dn_cc1, dn_cc2)
     assert_array_almost_equal(dn_cc1, dn_cc3)
-
-
-@xfail_without_pywt
-@pytest.mark.filterwarnings("ignore:.*dask dependency is not installed:UserWarning")
-@pytest.mark.parametrize("num_workers", [None, 1])
-def test_cycle_spinner_deprecate_num_workers(num_workers):
-    img = astro_gray
-    sigma = 0.1
-    rstate = np.random.RandomState(860004639)
-    noisy = img.copy() + 0.1 * rstate.standard_normal(img.shape)
-
-    denoise_func = restoration.denoise_wavelet
-    func_kw = dict(sigma=sigma, channel_axis=-1, rescale_sigma=True)
-
-    with pytest.warns(FutureWarning, match=".*`num_workers` is deprecated") as record:
-        restoration.cycle_spin(
-            noisy,
-            denoise_func,
-            max_shifts=1,
-            func_kw=func_kw,
-            channel_axis=None,
-            num_workers=num_workers,
-        )
-    assert_stacklevel(record, offset=-8)
