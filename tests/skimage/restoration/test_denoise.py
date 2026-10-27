@@ -8,6 +8,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from skimage import color, data, img_as_float, restoration
 from _skimage2._shared._warnings import expected_warnings
+from _skimage2._shared.testing import assert_stacklevel
 from _skimage2._shared.utils import _supported_float_type, slice_at_axis
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from skimage.restoration._denoise import _wavelet_threshold
@@ -1177,7 +1178,7 @@ def test_cycle_spinning_workers():
     )
     assert_array_equal(dn_cc1, dn_cc1_)
 
-    with expected_warnings([DASK_NOT_INSTALLED_WARNING]):
+    with expected_warnings([DASK_NOT_INSTALLED_WARNING]) as record:
         dn_cc2 = restoration.cycle_spin(
             noisy,
             denoise_func,
@@ -1186,6 +1187,9 @@ def test_cycle_spinning_workers():
             channel_axis=None,
             workers=4,
         )
+    if DASK_NOT_INSTALLED_WARNING is not None:
+        assert_stacklevel(record, offset=-9)
+    with expected_warnings([DASK_NOT_INSTALLED_WARNING]) as record:
         dn_cc3 = restoration.cycle_spin(
             noisy,
             denoise_func,
@@ -1194,5 +1198,7 @@ def test_cycle_spinning_workers():
             channel_axis=None,
             workers=None,
         )
+    if DASK_NOT_INSTALLED_WARNING is not None:
+        assert_stacklevel(record, offset=-9)
     assert_array_almost_equal(dn_cc1, dn_cc2)
     assert_array_almost_equal(dn_cc1, dn_cc3)
