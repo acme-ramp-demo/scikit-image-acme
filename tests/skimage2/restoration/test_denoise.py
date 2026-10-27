@@ -1202,3 +1202,51 @@ def test_cycle_spinning_workers():
         assert_stacklevel(record, offset=-9)
     assert_array_almost_equal(dn_cc1, dn_cc2)
     assert_array_almost_equal(dn_cc1, dn_cc3)
+
+
+def test_cycle_spin_num_workers_removed():
+    img = astro_gray
+    sigma = 0.1
+    rstate = np.random.RandomState(3749894672)
+    noisy = img.copy() + 0.1 * rstate.standard_normal(img.shape)
+
+    denoise_func = restoration.denoise_wavelet
+    func_kw = dict(sigma=sigma, channel_axis=-1, rescale_sigma=True)
+
+    # ``num_workers`` was removed. Callers pass ``workers`` instead.
+    with pytest.raises(TypeError, match="unexpected keyword argument 'num_workers'"):
+        restoration.cycle_spin(
+            noisy,
+            denoise_func,
+            max_shifts=1,
+            func_kw=func_kw,
+            channel_axis=None,
+            num_workers=1,
+        )
+
+
+def test_cycle_spin_positional_func_kw():
+    img = astro_gray
+    rstate = np.random.RandomState(2715157968)
+    noisy = img.copy() + 0.1 * rstate.standard_normal(img.shape)
+
+    received = []
+
+    def record(image, **kwargs):
+        received.append(kwargs)
+        return image * kwargs.get('scale', 1.0)
+
+    func_kw = dict(scale=2.0)
+    # ``func_kw`` is the 5th positional parameter.
+    out_pos = restoration.cycle_spin(noisy, record, 0, 1, func_kw, workers=1)
+    out_kw = restoration.cycle_spin(
+        noisy,
+        record,
+        max_shifts=0,
+        shift_steps=1,
+        func_kw=func_kw,
+        workers=1,
+    )
+    assert received == [func_kw, func_kw]
+    assert_array_equal(out_pos, out_kw)
+    assert_array_equal(out_pos, noisy * func_kw['scale'])
