@@ -103,12 +103,12 @@ No source edit. `src/skimage2/restoration/__init__.py` forwards `__getattr__` / 
 
 ### `tests/skimage`
 
-- `tests/skimage/restoration/test_denoise.py` — Delete `test_cycle_spinner_deprecate_num_workers` (the `num_workers` parametrization, the `FutureWarning` match, and `assert_stacklevel(record, offset=-8)`). That import of `assert_stacklevel` is used only by this test. Remove the import if the stacklevel follow-up below is declined. Required by `20-deprecations.mdc` item 5 and `30-testing.mdc` (both trees).
+- `tests/skimage/restoration/test_denoise.py` — Delete `test_cycle_spinner_deprecate_num_workers` (the `num_workers` parametrization, the `FutureWarning` match, and `assert_stacklevel(record, offset=-8)`). Keep the `assert_stacklevel` import: the accepted follow-up uses it in `test_cycle_spinning_workers`. Required by `20-deprecations.mdc` item 5 and `30-testing.mdc` (both trees).
 - `tests/skimage/test_migration.py` — Replace the `SKIMAGE_API` string so `num_workers=<DEPRECATED>, ` is gone and `func_kw=None` follows `shift_steps=1`. Required by `20-deprecations.mdc` (recorded signature).
 
 ### `tests/skimage2`
 
-- `tests/skimage2/restoration/test_denoise.py` — Same test deletion as the `tests/skimage` copy. The two files are separate (different imports, and `binary_blobs` is called differently). Edit only the deprecation test and, if declined, the `assert_stacklevel` import. Leave the other differences. Required by `20-deprecations.mdc` item 5 and `30-testing.mdc`.
+- `tests/skimage2/restoration/test_denoise.py` — Same test deletion and the same stacklevel assertion as the `tests/skimage` copy. The two files are separate (different imports, and `binary_blobs` is called differently). Leave the other differences. Required by `20-deprecations.mdc` item 5 and `30-testing.mdc`.
 
 There is no `tests/skimage2` copy of `test_migration.py`.
 
@@ -144,7 +144,7 @@ Also from that rule:
 
 `00-project-map.mdc`: the edit lives in `_skimage2`. `skimage` and `skimage2` only re-export, so they need no source change. Tests exist in both trees and both copies of `test_denoise.py` change. Import direction stays one-way.
 
-`30-testing.mdc`: behavior change is covered by the signature test and by the existing `workers=` tests, which would fail if `workers` stopped working. Warnings are errors in tests, so a leftover `num_workers=` call fails. No new randomness. The agent proposes the stacklevel check; the engineer decides whether to add it.
+`30-testing.mdc`: behavior change is covered by the signature test and by the existing `workers=` tests, which would fail if `workers` stopped working. Warnings are errors in tests, so a leftover `num_workers=` call fails. No new randomness. The stacklevel check was accepted on 2026-10-27.
 
 `10-python-style.mdc`: this change does not restyle the existing absolute `_skimage2` imports in `_cycle_spin.py` into relative imports. Drop only the names that become unused.
 
@@ -167,7 +167,7 @@ Change:
 - Delete the deprecation test in both trees.
 - Update the `SKIMAGE_API` signature string.
 
-Proposed check, for the engineer to accept or skip at the next stage: when dask is not installed, assert the stacklevel of the missing-dask `UserWarning` inside `test_cycle_spinning_workers`, in both trees. Reason: `stacklevel` must drop from 4 to 3, and `expected_warnings` only checks the message. When dask is installed, `DASK_NOT_INSTALLED_WARNING` is `None` and `expected_warnings(None)` is a no-op, so the assertion belongs on the dask-missing branch. If this check is accepted, keep the `assert_stacklevel` import. If it is skipped, delete that import from both files.
+Accepted 2026-10-27: when dask is not installed, assert the stacklevel of the missing-dask `UserWarning` inside `test_cycle_spinning_workers`, in both trees. Reason: `stacklevel` must drop from 4 to 3, and `expected_warnings` only checks the message. The two `cycle_spin` calls warn on different lines, so each call has its own `expected_warnings` block and `assert_stacklevel(record, offset=-9)`. The offset counts back to the first line of that multiline call. When dask is installed, `DASK_NOT_INSTALLED_WARNING` is `None` and the assertion is skipped. The `assert_stacklevel` import stays.
 
 Commands after the code change (not part of this plan step):
 
